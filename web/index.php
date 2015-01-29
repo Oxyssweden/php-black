@@ -28,6 +28,19 @@ $app->get('/', function () use ($app) {
 });
 
 
+$app->get('/input/{id}', function ($id) use ($app) {
+  $msg = exec("sudo -t /usr/bin/php ../reader $id");
+  $code = ("" === trim($msg)) ? 200 : 500;
+
+  if (!$id) {
+    $error = array('message' => 'Must specify an id');
+    return $app->json($error, 404);
+  }
+
+  return $app->json(array('message' => $msg));
+});
+
+
 $app['debug'] = true;
 $app->run();
 
