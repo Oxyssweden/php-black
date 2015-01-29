@@ -1,0 +1,77 @@
+#!/usr/bin/env php
+<?php
+
+# Usage :
+#
+#   $ sudo blinker 17 200000
+#
+# = Blink GPIO #17 pin with 0.2 second delay
+
+require 'vendor/autoload.php';
+
+use PhpGpio\Gpio;
+
+// Am i using php-cli?
+if ('cli' != PHP_SAPI) {
+    echo $msg = "This script must be run using php-cli";
+    throw new \Exception($msg);
+}
+
+// Am I a sudoer or the root user?
+if ('root' !== $_SERVER['USER'] || empty($_SERVER['SUDO_USER'])) {
+    echo $msg = "Please run this script as root, using sudo -t ; please check the README file";
+    throw new \Exception($msg);
+}
+
+// Am I using only 2 integer arguments ?
+if (
+    !(2 === $argc)
+    || strlen($argv[1]) != 1
+) {
+    echo $msg = "Blä";
+    throw new \Exception($msg);
+}
+
+
+$input = (int)$argv[1];
+$gpio = new GPIO();
+
+$map = array(
+  1 => 13,
+  2 => 6,
+  3 => 17,
+  4 => 22,
+  5 => 27,
+  6 => 19,
+  7 => 26
+);
+
+$segments = array(
+  '0' => array(1,2,3,4,5,6),
+  '1' => array(5,6),
+  '2' => array(1,2,4,5,7),
+  '3' => array(1,2,3,4,7),
+  '4' => array(2,3,6,7),
+  '5' => array(1,3,4,6,7),
+  '6' => array(1,3,4,5,6,7),
+  '7' => array(1,2,3),
+  '8' => array(1,2,3,4,5,6,7),
+  '9' => array(1,2,3,4,6,7),
+  'E' => array(1,4,5,6,7),
+);
+
+foreach ($segments[$input] as $segment) {
+  $pin = $map[$segment];
+  $gpio->setup($pin, "out");
+  $gpio->output($pin, 1);
+}
+
+sleep('1');
+
+foreach ($segments[$input] as $segment) {
+  $pin = $map[$segment];
+  $gpio->output($pin, 0);
+}
+
+$gpio->unexportAll();
+
