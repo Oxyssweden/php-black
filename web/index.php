@@ -21,6 +21,13 @@ $app->get('/blink/{id}', function ($id) use ($app) {
     return new Response($msg, $code);
 });
 
+$app->get('/message/{str}', function ($str) use ($app) {
+  $str = '"' . urldecode($str) . '"';
+  $msg = exec("sudo -t /usr/bin/php ../number $str");
+  $code = ("" === trim($msg)) ? 200 : 500;
+  return new Response($msg, $code);
+});
+
 
 $app->get('/', function () use ($app) {
     require_once __DIR__.'/buttons.html';

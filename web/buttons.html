@@ -8,7 +8,7 @@
         </style>
     </head>
     <body>
-        <p>GPIO: <input type="number" min="1" max="26" value="17" /> <button id="numberButton">Blink!</button><span></span></p>
+        <p>Message: <input /> <button id="numberButton">Go!</button><span></span></p>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function() {
@@ -17,7 +17,7 @@
                     $(this).fadeOut('fast', function() {
                         var el = this;
                         $.ajax({
-                            url: "/blink/" + $('input').val(),
+                            url: "/message/" + encodeURI($('input').val()),
                             statusCode: {
                                 500: function(data, textStatus, jqXHR) {
                                     showResult(data, textStatus, jqXHR, el);
